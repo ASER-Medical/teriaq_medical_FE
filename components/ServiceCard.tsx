@@ -11,6 +11,7 @@ interface ServiceCardProps {
   count: number;
   image: string;
   unit: string;
+  onClick?: () => void; // This was here, but unused below
 }
 
 export default function ServiceCard({
@@ -19,24 +20,30 @@ export default function ServiceCard({
   count,
   image,
   unit,
+  onClick, // 1. Destructure it here
 }: ServiceCardProps) {
   return (
-    <div className="relative w-full max-w-[380px] p-4" dir="rtl">
-      {/* SVG CLIP PATH - Created the "Inverted" corner scoop */}
+    // 2. Add cursor-pointer and onClick to the wrapper or Card
+    <div 
+      className="relative w-full max-w-[380px] p-4 cursor-pointer" 
+      dir="rtl"
+      onClick={onClick} 
+    >
+      {/* SVG CLIP PATH remains the same */}
       <svg width="0" height="0" className="absolute">
         <defs>
           <clipPath id="card-clip" clipPathUnits="objectBoundingBox">
             <path
               d="M 0,0 
-     L 0.85,0 
-     Q 1,0 1,0.05 
-     L 1,0.68 
-     Q 1,0.85 0.9,0.85 
-     L 0.88,0.85
-     C 0.75,0.85 0.85,1 0.75,1 
-     L 0.05,1 
-     Q 0,1 0,0.95 
-     Z"
+      L 0.85,0 
+      Q 1,0 1,0.05 
+      L 1,0.68 
+      Q 1,0.85 0.9,0.85 
+      L 0.88,0.85
+      C 0.75,0.85 0.85,1 0.75,1 
+      L 0.05,1 
+      Q 0,1 0,0.95 
+      Z"
             />
           </clipPath>
         </defs>
@@ -47,7 +54,6 @@ export default function ServiceCard({
         className="relative h-[360px] overflow-hidden border-none bg-[#FAF9F6] p-10 shadow-sm"
       >
         <div className="relative z-10 flex h-full flex-col items-start">
-          {/* Service Icon/Image */}
           <div className="mb-10 mr-40">
             <Image
               src={image}
@@ -67,7 +73,6 @@ export default function ServiceCard({
               {description}
             </p>
 
-            {/* NEW: Small 'A' between two small lines */}
             <div className="flex items-center gap-2 mb-6">
               <div className="h-[1px] w-25 bg-slate-400/40 mr-30" />
             </div>
@@ -82,8 +87,12 @@ export default function ServiceCard({
         </div>
       </Card>
 
-      {/* Floating Action Button */}
+      {/* 3. Also add onClick to the button just in case user clicks exactly on it */}
       <button
+        onClick={(e) => {
+          e.stopPropagation(); // Prevents double-firing if parent also has onClick
+          onClick?.();
+        }}
         className="absolute bottom-5 right-7.5 z-20 flex h-10 w-10 items-center justify-center rounded-full bg-[#1ABAE2] text-white shadow-lg transition-all hover:scale-110 hover:bg-[#15a3c7]"
         aria-label="View Details"
       >
