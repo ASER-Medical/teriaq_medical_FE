@@ -2,11 +2,12 @@
 
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { AuthService } from "@/services/auth.service";
 import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export default function IndividualForm() {
+  const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -14,15 +15,31 @@ export default function IndividualForm() {
   const submit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
-    const formData = Object.fromEntries(new FormData(e.currentTarget));
-    try {
-      await AuthService.registerIndividual(formData);
-      alert("تم التسجيل بنجاح");
-    } catch (err: any) {
-      alert(err.response?.data?.message || "حدث خطأ");
-    } finally {
-      setLoading(false);
-    }
+    
+    // Capture the form data
+    const formData = new FormData(e.currentTarget);
+    const data = Object.fromEntries(formData);
+
+    // --- STATIC MOCK LOGIC ---
+    // 1. Simulate a delay (like a real API)
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+
+    // 2. Save data to localStorage so the Profile page can read it
+    localStorage.setItem("user_session", JSON.stringify({
+      full_name: data.full_name,
+      email: data.email,
+      phone: data.phone,
+      national_id: data.national_id,
+      // Default values for fields not in the registration form
+      dob: "2000-01-01",
+      gender: "ذكر"
+    }));
+
+    // 3. Redirect to the profile page
+    router.push("/book");
+    // -------------------------
+    
+    setLoading(false);
   };
 
   const labelStyle = "block text-right text-sm font-bold text-[#1a4b5c] mb-1.5";
@@ -33,59 +50,49 @@ export default function IndividualForm() {
       <form onSubmit={submit} className="space-y-4">
         <div>
           <label className={labelStyle}>الاسم بالكامل</label>
-          <Input name="full_name" placeholder="هاجر" className={inputStyle} />
+          <Input name="full_name" placeholder="أدخل اسمك" className={inputStyle} required />
         </div>
 
         <div>
           <label className={labelStyle}>الرقم القومي</label>
-          <Input name="national_id" placeholder="ادخل رقمك القومي" className={inputStyle} />
+          <Input name="national_id" placeholder="ادخل رقمك القومي" className={inputStyle} required />
         </div>
 
         <div>
           <label className={labelStyle}>البريد الإلكتروني</label>
-          <Input name="email" placeholder="email@email.com" className={inputStyle} />
+          <Input name="email" type="email" placeholder="email@email.com" className={inputStyle} required />
         </div>
 
         <div>
           <label className={labelStyle}>رقم موبايل</label>
-          <Input name="phone" placeholder="123 4567 1234" className={inputStyle} />
+          <Input name="phone" placeholder="01xxxxxxxxx" className={inputStyle} required />
         </div>
 
-        {/* Password Field with Eye */}
         <div className="relative">
           <label className={labelStyle}>الرقم السري</label>
           <div className="relative">
             <Input 
               type={showPassword ? "text" : "password"} 
               name="password" 
-              placeholder="••••" 
               className={inputStyle} 
+              required
             />
-            <button
-              type="button"
-              onClick={() => setShowPassword(!showPassword)}
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-            >
+            <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
               {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
             </button>
           </div>
         </div>
 
-        {/* Confirm Password Field with Eye */}
         <div className="relative">
           <label className={labelStyle}>تأكيد الرقم السري</label>
           <div className="relative">
             <Input 
               type={showConfirmPassword ? "text" : "password"} 
               name="confirm_password" 
-              placeholder="ادخل الرقم السري" 
               className={inputStyle} 
+              required
             />
-            <button
-              type="button"
-              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-            >
+            <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
               {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
             </button>
           </div>

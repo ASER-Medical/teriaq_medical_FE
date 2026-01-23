@@ -5,26 +5,42 @@ import { Button } from "@/components/ui/button";
 import { AuthService } from "@/services/auth.service";
 import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export default function SyndicateForm() {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const router = useRouter();
 
   const submit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
+    
+    // Capture the form data
+    const formData = new FormData(e.currentTarget);
+    const data = Object.fromEntries(formData);
 
-    const data = Object.fromEntries(new FormData(e.currentTarget));
+    // --- STATIC MOCK LOGIC ---
+    // 1. Simulate a delay (like a real API)
+    await new Promise((resolve) => setTimeout(resolve, 1000));
 
-    try {
-      await AuthService.registerSyndicate(data);
-      alert("تم التسجيل بنجاح");
-    } catch (err: any) {
-      alert(err.response?.data?.message || "حدث خطأ");
-    } finally {
-      setLoading(false);
-    }
+    // 2. Save data to localStorage so the Profile page can read it
+    localStorage.setItem("user_session", JSON.stringify({
+      full_name: data.full_name,
+      email: data.email,
+      phone: data.phone,
+      national_id: data.national_id,
+      // Default values for fields not in the registration form
+      dob: "2000-01-01",
+      gender: "ذكر"
+    }));
+
+    // 3. Redirect to the profile page
+    router.push("/book");
+    // -------------------------
+    
+    setLoading(false);
   };
 
   const labelStyle =

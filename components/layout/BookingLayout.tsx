@@ -28,6 +28,7 @@ export default function BookingLayout({
         mx-auto
         py-4 sm:py-6
         px-4 sm:px-6 lg:px-10
+        bg-white
       "
       dir="rtl"
     >
